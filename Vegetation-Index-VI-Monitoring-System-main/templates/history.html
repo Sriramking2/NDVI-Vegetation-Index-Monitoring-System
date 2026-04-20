@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📜 NDVI Analysis History</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <!-- Include JSZip and FileSaver for download functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <link rel="stylesheet" href="../static/style/history.css">
+
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Vegetation History</h1>
+                    <p>NDVI Analysis & Monitoring System</p>
+                </div>
+            </div>
+            
+                <div class="nav-links">
+                    <a href="/" class="nav-btn">
+                        <i class="fas fa-map"></i> Map
+                    </a>
+                                    <a href="/health_analysis" class="nav-btn">
+                        <i class="fas fa-seedling"></i> Health Analysis
+                    </a>
+                    <a href="/history" class="nav-btn active">
+                        <i class="fas fa-history"></i> History
+                    </a>
+                    <a href="/soil" class="nav-btn">
+                        <i class="fas fa-flask"></i> Soil
+                    </a>
+                    <a href="/statistics" class="nav-btn ">
+                        <i class="fas fa-chart-bar"></i> Statistics
+                    </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Stats Cards -->
+        <div class="stats-container" id="statsContainer">
+            <!-- Stats will be populated by JavaScript -->
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="filters-header">
+                <div class="filters-title">
+                    <i class="fas fa-filter"></i> Filter Results
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterHistory('all')">All</button>
+                    <button class="filter-btn" onclick="filterHistory('today')">Today</button>
+                    <button class="filter-btn" onclick="filterHistory('week')">This Week</button>
+                    <button class="filter-btn" onclick="filterHistory('month')">This Month</button>
+                </div>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by location name...">
+                <button class="search-btn" onclick="searchHistory()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <button class="search-btn" onclick="clearSearch()" style="background: var(--text-secondary);">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- History Grid -->
+        <div id="historyContent">
+            <!-- Loading state -->
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Empty state (initially hidden) -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>No Analysis History Found</h3>
+                <p>Generate your first NDVI analysis to see it here</p>
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-map-marked-alt"></i> Go to Map
+                </a>
+            </div>
+
+            <!-- History Grid (initially hidden) -->
+            <div class="history-grid" id="historyGrid" style="display: none;">
+                <!-- History cards will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Image Modal -->
+    <div class="modal-overlay" id="imageModal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modalTitle">Image Preview</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" class="modal-image" alt="Preview">
+                <div id="modalInfo"></div>
+            </div>
+        </div>
+    </div>
+
+            <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <i class="fas fa-seedling"></i>
+                        <span>AgriHealth Analytics</span>
+                    </div>
+                    <p class="footer-text">© 2024 Agricultural Health Analysis | Satellite-based Soil & Crop Monitoring</p>
+
+                </div>
+            </div>
+
+        </footer>
+
+    <script src="../static/script/history.js"></script>
+
+</body>
+</html>
+            

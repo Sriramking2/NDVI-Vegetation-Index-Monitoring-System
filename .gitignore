@@ -1,0 +1,28 @@
+.DS_Store
+.vscode/
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+env/
+
+# Local runtime data
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated reports and model outputs
+outputs/
+recommend/outputs/
+Vegetation-Index-VI-Monitoring-System-main/static/ndvi/
+Vegetation-Index-VI-Monitoring-System-main/static/*.png
+Vegetation-Index-VI-Monitoring-System-main/static/*.tif
+
+# Notebook and test artifacts
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/

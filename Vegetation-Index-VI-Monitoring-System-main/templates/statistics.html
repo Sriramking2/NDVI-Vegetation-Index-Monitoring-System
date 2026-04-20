@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 NDVI Analysis Statistics & Health Monitoring</title>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../static/style/statistics.css">
+
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Analysis Statistics</h1>
+                    <p>Comprehensive Analytics & System Health Monitoring</p>
+                </div>
+            </div>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-btn">
+                    <i class="fas fa-map"></i> Map
+                </a>
+                                <a href="/health_analysis" class="nav-btn">
+                    <i class="fas fa-seedling"></i> Health Analysis
+                </a>
+                <a href="/history" class="nav-btn">
+                    <i class="fas fa-history"></i> History
+                </a>
+                <a href="/soil" class="nav-btn">
+                    <i class="fas fa-flask"></i> Soil
+                </a>
+                <a href="/statistics" class="nav-btn active">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Dashboard Stats -->
+        <div class="stats-grid" id="dashboardStats">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Health Status -->
+        <div class="health-status" id="healthStatus">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="chart-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-chart-area"></i>
+                    Analysis Trends
+                </div>
+                <div>
+                    <select id="periodSelect" class="nav-btn" style="background: white; color: var(--text-primary);">
+                        <option value="week">Last 7 Days</option>
+                        <option value="month">Last 12 Months</option>
+                        <option value="year">Yearly</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadCharts()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Location Distribution -->
+        <div class="chart-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Location Distribution
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="locationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- File Statistics -->
+        <div class="chart-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-file-image"></i>
+                    File Statistics
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="fileChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    
+
+    <footer class="footer">
+        <br>
+        <p>© 2024 NDVI Analysis Tool | Real-time Statistics & Health Monitoring</p>
+        <br>
+        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">
+            Last Updated: <span id="lastUpdated">Loading...</span>
+        </p>
+    </footer>
+
+    <script src="../static/script/statistics.js"></script>
+</body>
+</html>

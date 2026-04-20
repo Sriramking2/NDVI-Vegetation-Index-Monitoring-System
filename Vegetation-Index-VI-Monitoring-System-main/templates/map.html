@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 NDVI Analysis Tool | Satellite Vegetation Analysis</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- JSZip for creating zip files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- FileSaver for downloading files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <link rel="stylesheet" href="../static/style/map.css">
+
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Vegetation Index Analysis Tool</h1>
+                <p>Satellite Vegetation Analysis Platform</p>
+            </div>
+        </div>
+        
+           <div class="nav-links">
+
+            <a href="/map" class="nav-btn active">
+                <i class="fas fa-map"></i> Map
+            </a>
+
+            <a href="/health_analysis" class="nav-btn">
+                <i class="fas fa-seedling"></i> Health Analysis
+            </a>
+ 
+ 
+            <a href="/history" class="nav-btn">
+                <i class="fas fa-history"></i> History
+            </a>
+            <a href="/soil" class="nav-btn">
+                <i class="fas fa-flask"></i> Soil
+            </a>
+
+                        <!-- History button from second section -->
+          
+
+            <!-- Statistics button from second section -->
+            <a href="/statistics" class="nav-btn" >
+                <i class="fas fa-chart-bar"></i> Statistics
+            </a>
+            
+
+            
+
+            
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div id="container">
+        <!-- Map Section -->
+        <div id="map-section">
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About NDVI Analysis</span>
+                    </div>
+                    <span class="badge" style="background: var(--primary-light); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem;">
+                        <i class="fas fa-satellite"></i> Real-time Data
+                    </span>
+                </div>
+                <p>NDVI (Normalized Difference Vegetation Index) measures vegetation health using satellite imagery. Values range from -1 to 1, with higher values indicating healthier vegetation.</p>
+                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                <!-- Clear Map button from second section -->
+            <button class="nav-btn1" onclick="clearMap()">
+                <i class="fas fa-eraser"></i> Clear Map
+            </button>
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div id="panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Analysis Steps</span>
+                    </div>
+                </div>
+                
+                <ol class="steps-list">
+                    <li class="step-item">
+                        <h4>Draw a Polygon</h4>
+                        <p>Use the polygon tool in the top-right corner to select an area</p>
+                    </li>
+                    <li class="step-item">
+                        <h4>Generate Analysis</h4>
+                        <p>Click the button below to process satellite data</p>
+                    </li>
+                    <li class="step-item">
+                        <h4>View & Download</h4>
+                        <p>Examine vegetation indices and download all images</p>
+                    </li>
+                </ol>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="getNDVI()" id="analyzeBtn">
+                        <i class="fas fa-chart-line"></i> Generate Vegetation Analysis
+                    </button>
+                </div>
+                                <!-- Status Message -->
+                <div id="message"></div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar">0%</div>
+                </div>
+            </div>
+            
+           
+        </div>
+    </div>
+
+
+     <!-- Results Section -->
+      <div id="container1">
+            <div class="card" id="resultsCard" >
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Analysis Results</span>
+                    </div>
+                    <div id="resultPlace" style="font-weight: 500; color: var(--primary-color);"></div>
+                </div>
+                
+                <p id="resultTimestamp" style="margin-bottom: 20px; color: var(--text-secondary); font-size: 0.9rem;"></p>
+                
+                <div class="results-grid">
+                    <!-- NDVI -->
+                    <div class="result-card">
+                        <div class="result-header">NDVI</div>
+                        <div class="result-placeholder" id="ndviPlaceholder">
+                            <i class="fas fa-leaf"></i>
+                            <p>Normalized Difference Vegetation Index</p>
+                        </div>
+                        <img id="ndviImage" class="result-image" alt="NDVI">
+                    </div>
+                    
+                    <!-- RGB -->
+                    <div class="result-card">
+                        <div class="result-header">RGB</div>
+                        <div class="result-placeholder" id="rgbPlaceholder">
+                            <i class="fas fa-image"></i>
+                            <p>True Color Satellite View</p>
+                        </div>
+                        <img id="rgbImage" class="result-image" alt="RGB">
+                    </div>
+                    
+                    <!-- SAVI -->
+                    <div class="result-card">
+                        <div class="result-header">SAVI</div>
+                        <div class="result-placeholder" id="saviPlaceholder">
+                            <i class="fas fa-tree"></i>
+                            <p>Soil Adjusted Vegetation Index</p>
+                        </div>
+                        <img id="saviImage" class="result-image" alt="SAVI">
+                    </div>
+                    
+                    <!-- GNDVI -->
+                    <div class="result-card">
+                        <div class="result-header">GNDVI</div>
+                        <div class="result-placeholder" id="gndviPlaceholder">
+                            <i class="fas fa-seedling"></i>
+                            <p>Green Normalized Difference Index</p>
+                        </div>
+                        <img id="gndviImage" class="result-image" alt="GNDVI">
+                    </div>
+                    
+                    <!-- EVI -->
+                    <div class="result-card">
+                        <div class="result-header">EVI</div>
+                        <div class="result-placeholder" id="eviPlaceholder">
+                            <i class="fas fa-chart-line"></i>
+                            <p>Enhanced Vegetation Index</p>
+                        </div>
+                        <img id="eviImage" class="result-image" alt="EVI">
+                    </div>
+                </div>
+
+                <!-- Download Section - Downloads ALL images -->
+                <div class="download-section">
+                    <button class="download-btn" onclick="downloadAllImages()" id="downloadAllBtn">
+                        <i class="fas fa-file-archive"></i> Download All Images (ZIP)
+                    </button>
+                    <p class="download-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Downloads all 5 vegetation index images as a ZIP file
+                    </p>
+                    
+                    <div class="download-options">
+                        <button class="download-option-btn" onclick="downloadIndividual('ndvi')">
+                            <i class="fas fa-download"></i> NDVI Only
+                        </button>
+                        <button class="download-option-btn" onclick="downloadIndividual('rgb')">
+                            <i class="fas fa-download"></i> RGB Only
+                        </button>
+                        <button class="download-option-btn" onclick="downloadIndividual('savi')">
+                            <i class="fas fa-download"></i> SAVI Only
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <i class="fas fa-seedling"></i>
+                        <span>AgriHealth Analytics</span>
+                    </div>
+                    <p class="footer-text">© 2024 Agricultural Health Analysis | Satellite-based Soil & Crop Monitoring</p>
+
+                </div>
+            </div>
+
+        </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    <script src="../static/script/map.js"></script>
+
+
+
+
+
+</body>
+</html>
+

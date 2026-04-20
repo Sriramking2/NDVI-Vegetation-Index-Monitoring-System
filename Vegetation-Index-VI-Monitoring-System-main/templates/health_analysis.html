@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Soil & Crop Health Analysis</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../static/style/health_analysis.css">
+    
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Health Analysis</h1>
+                    <p>Comprehensive Analytics Soil & Crop Health Monitoring</p>
+                </div>
+            </div>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-btn">
+                    <i class="fas fa-map"></i> Map
+                </a>
+                                <a href="/health_analysis" class="nav-btn active">
+                    <i class="fas fa-seedling"></i> Health Analysis
+                </a>
+                <a href="/history" class="nav-btn">
+                    <i class="fas fa-history"></i> History
+                </a>
+                <a href="/soil" class="nav-btn">
+                    <i class="fas fa-flask"></i> Soil
+                </a>
+                <a href="/statistics" class="nav-btn">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <!-- Map Section (Top) -->
+                <section class="map-section">
+                    <div class="section-container">
+                        <div class="section-header">
+                            <h2><i class="fas fa-map-marker-alt"></i> Select Analysis Area</h2>
+                
+                            <p>Draw a polygon on the map to define the analysis area</p>
+                        </div>
+                        <div class="map-container">
+                            <div id="map"></div>
+                            <div class="map-controls">
+                                <button class="map-control-btn" onclick="clearMap()">
+                                    <i class="fas fa-redo"></i> Clear Selection
+                                </button>
+                                <div class="map-instruction">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Use the drawing tool to select an area</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analysis Panels Section -->
+                <section class="analysis-section">
+                    <div class="section-container">
+                        <div class="section-header">
+                            <h2><i class="fas fa-chart-line"></i> Health Analysis</h2>
+                            <p>Comprehensive soil and crop health assessment</p>
+                        </div>
+                        
+                        <div class="analysis-panels">
+                            <!-- Left Panel - Soil Analysis -->
+                            <div class="analysis-panel soil-panel">
+                                <div class="panel-header">
+                                    <div class="panel-title">
+                                        <div class="panel-icon">
+                                            <i class="fas fa-mountain"></i>
+                                        </div>
+                                        <div class="panel-text">
+                                            <h3>Soil Health Analysis</h3>
+                                            <p>Soil quality metrics and assessment</p>
+                                        </div>
+                                    </div>
+                                    <div class="panel-score">
+                                        <div class="score-label">Health Score</div>
+                                        <div class="score-value soil-score" id="soilScore">--</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="panel-body">
+                                    <div class="metrics-container">
+                                        <div class="metric-row">
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-tint"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="soilMoisture">--</div>
+                                                    <div class="metric-label">Moisture Index</div>
+                                                </div>
+                                            </div>
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-recycle"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="soilOrganic">--</div>
+                                                    <div class="metric-label">Organic Matter</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="metric-row">
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-layer-group"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="soilTexture">--</div>
+                                                    <div class="metric-label">Texture Score</div>
+                                                </div>
+                                            </div>
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-flask"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="soilPH">--</div>
+                                                    <div class="metric-label">pH Level</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Panel - Crop Analysis -->
+                            <div class="analysis-panel crop-panel">
+                                <div class="panel-header">
+                                    <div class="panel-title">
+                                        <div class="panel-icon">
+                                            <i class="fas fa-leaf"></i>
+                                        </div>
+                                        <div class="panel-text">
+                                            <h3>Crop Health Analysis</h3>
+                                            <p>Crop growth and stress metrics</p>
+                                        </div>
+                                    </div>
+                                    <div class="panel-score">
+                                        <div class="score-label">Health Score</div>
+                                        <div class="score-value crop-score" id="cropScore">--</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="panel-body">
+                                    <div class="metrics-container">
+                                        <div class="metric-row">
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-bolt"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="cropVigor">--</div>
+                                                    <div class="metric-label">Vigor Index</div>
+                                                </div>
+                                            </div>
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="cropStress">--</div>
+                                                    <div class="metric-label">Stress Level</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="metric-row">
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="cropYield">--</div>
+                                                    <div class="metric-label">Yield Potential</div>
+                                                </div>
+                                            </div>
+                                            <div class="metric-item">
+                                                <div class="metric-icon">
+                                                    <i class="fas fa-palette"></i>
+                                                </div>
+                                                <div class="metric-content">
+                                                    <div class="metric-value" id="cropChlorophyll">--</div>
+                                                    <div class="metric-label">Chlorophyll</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Single Analysis Button -->
+                        
+                    </div>
+                </section>
+
+                <!-- Results Section (Bottom) -->
+                <section class="results-section">
+                    <div class="section-container">
+                        <div class="section-header">
+                            <h2><i class="fas fa-chart-bar"></i> Analysis Results</h2>
+                            <p>Visual representation of soil and crop health metrics</p>
+                        </div>
+                        
+                        <div class="results-grid" id="resultsGrid" style="display: none;">
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">
+                                        <i class="fas fa-mountain"></i>
+                                        <h3>Soil Health Map</h3>
+                                    </div>
+                                    <div class="result-status" id="soilStatus">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Pending</span>
+                                    </div>
+                                </div>
+                                <div class="result-body">
+                                    <div class="result-placeholder" id="soilPlaceholder">
+                                        <i class="fas fa-mountain placeholder-icon"></i>
+                                        <p>Soil analysis results will appear here</p>
+                                    </div>
+                                    <img id="soilImage" class="result-image" alt="Soil Health Map">
+                                </div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">
+                                        <i class="fas fa-leaf"></i>
+                                        <h3>Crop Health Map</h3>
+                                    </div>
+                                    <div class="result-status" id="cropStatus">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Pending</span>
+                                    </div>
+                                </div>
+                                <div class="result-body">
+                                    <div class="result-placeholder" id="cropPlaceholder">
+                                        <i class="fas fa-leaf placeholder-icon"></i>
+                                        <p>Crop analysis results will appear here</p>
+                                    </div>
+                                    <img id="cropImage" class="result-image" alt="Crop Health Map">
+                                </div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        <h3>NDVI Analysis</h3>
+                                    </div>
+                                    <div class="result-status" id="ndviStatus">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Pending</span>
+                                    </div>
+                                </div>
+                                <div class="result-body">
+                                    <div class="result-placeholder" id="ndviPlaceholder">
+                                        <i class="fas fa-chart-line placeholder-icon"></i>
+                                        <p>NDVI analysis results will appear here</p>
+                                    </div>
+                                    <img id="ndviImage" class="result-image" alt="NDVI Analysis">
+                                </div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">
+                                        <i class="fas fa-tree"></i>
+                                        <h3>SAVI Analysis</h3>
+                                    </div>
+                                    <div class="result-status" id="saviStatus">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Pending</span>
+                                    </div>
+                                </div>
+                                <div class="result-body">
+                                    <div class="result-placeholder" id="saviPlaceholder">
+                                        <i class="fas fa-tree placeholder-icon"></i>
+                                        <p>SAVI analysis results will appear here</p>
+                                    </div>
+                                    <img id="saviImage" class="result-image" alt="SAVI Analysis">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-control">
+                            <button class="analyze-btn" onclick="analyzeHealth()" id="analyzeBtn">
+                                <i class="fas fa-play-circle"></i>
+                                <span>Start Analysis</span>
+                                <div class="btn-subtext">Analyze Soil & Crop Health</div>
+                            </button>
+                            <div class="analysis-status">
+                                <div class="status-indicator" id="statusIndicator">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Select an area on the map to begin analysis</span>
+                                </div>
+                                                                        <!-- In your HTML file, already has the button -->
+                                
+                       
+
+
+                            
+                            </div>
+
+                        </div>
+
+
+
+
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <i class="fas fa-seedling"></i>
+                        <span>AgriHealth Analytics</span>
+                    </div>
+                    <p class="footer-text">© 2024 Agricultural Health Analysis | Satellite-based Soil & Crop Monitoring</p>
+
+                </div>
+            </div>
+
+        </footer>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    <script src="../static/script/health_analysis.js"></script>
+
+
+
+
+</body>
+
+
+</html>

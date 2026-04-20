@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Health Advisor</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/style/soil.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Soil Health Advisor</h1>
+                    <p>NPK Analysis, Crop Suitability, and Fertilizer Guidance</p>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <a href="/map" class="nav-btn">
+                    <i class="fas fa-map"></i> Map
+                </a>
+                <a href="/health_analysis" class="nav-btn">
+                    <i class="fas fa-seedling"></i> Health Analysis
+                </a>
+                <a href="/history" class="nav-btn">
+                    <i class="fas fa-history"></i> History
+                </a>
+                <a href="/soil" class="nav-btn active">
+                    <i class="fas fa-flask"></i> Soil
+                </a>
+                <a href="/statistics" class="nav-btn">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-vial"></i>
+                    Soil Input Parameters
+                </div>
+            </div>
+
+            <form id="soilForm" class="form-grid">
+                <div class="form-group">
+                    <label for="nInput">Nitrogen (N)</label>
+                    <input id="nInput" name="N" type="number" step="any" required value="50">
+                </div>
+                <div class="form-group">
+                    <label for="pInput">Phosphorus (P)</label>
+                    <input id="pInput" name="P" type="number" step="any" required value="20">
+                </div>
+                <div class="form-group">
+                    <label for="kInput">Potassium (K)</label>
+                    <input id="kInput" name="K" type="number" step="any" required value="80">
+                </div>
+                <div class="form-group">
+                    <label for="phInput">pH</label>
+                    <input id="phInput" name="pH" type="number" step="any" required value="6.5">
+                </div>
+
+                <div class="form-group">
+                    <label for="tempInput">Temperature (C)</label>
+                    <input id="tempInput" name="temperature" type="number" step="any" placeholder="Optional">
+                </div>
+                <div class="form-group">
+                    <label for="rainInput">Rainfall (mm)</label>
+                    <input id="rainInput" name="rainfall" type="number" step="any" placeholder="Optional">
+                </div>
+                <div class="form-group">
+                    <label for="humInput">Humidity (%)</label>
+                    <input id="humInput" name="humidity" type="number" step="any" placeholder="Optional">
+                </div>
+                <div class="form-actions">
+                    <button class="analyze-btn" type="submit">
+                        <i class="fas fa-microscope"></i> Analyze Soil
+                    </button>
+                </div>
+            </form>
+
+            <div id="errorBox" class="error-box" style="display:none"></div>
+        </section>
+
+        <section id="results" class="results" style="display:none">
+            <div class="results-grid">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-heart-pulse"></i>
+                            Soil Health Label
+                        </div>
+                    </div>
+                    <div class="label-value" id="soilLabel">-</div>
+                    <div class="tag" id="confidenceTag"></div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-leaf"></i>
+                            Recommended Crops
+                        </div>
+                    </div>
+                    <ul class="list" id="cropList"></ul>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-chart-column"></i>
+                            NPK Levels
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="npkChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-seedling"></i>
+                            Crop Suitability
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="cropChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-prescription-bottle-medical"></i>
+                        Fertilizer Recommendations
+                    </div>
+                </div>
+                <ul class="list" id="fertList"></ul>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let npkChart;
+        let cropChart;
+
+        document.getElementById("soilForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const payload = Object.fromEntries(formData.entries());
+
+            const errorBox = document.getElementById("errorBox");
+            errorBox.style.display = "none";
+            errorBox.textContent = "";
+
+            let res;
+            let data;
+            try {
+                res = await fetch("/soil/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                data = await res.json();
+            } catch (err) {
+                errorBox.textContent = "Request failed. Please try again.";
+                errorBox.style.display = "block";
+                return;
+            }
+
+            if (!res.ok) {
+                errorBox.textContent = data.error || "Unable to analyze soil.";
+                errorBox.style.display = "block";
+                return;
+            }
+
+            document.getElementById("results").style.display = "block";
+            document.getElementById("soilLabel").innerText = data.predicted_label || "Unknown";
+            document.getElementById("confidenceTag").innerText = `Model confidence: ${data.fertilizer_confidence || "Unknown"}`;
+
+            const cropList = document.getElementById("cropList");
+            cropList.innerHTML = "";
+            (data.crop_recs || []).forEach((c) => {
+                const li = document.createElement("li");
+                li.className = "list-item";
+                li.innerHTML = `<span class="item-name">${c.crop}</span><span class="item-badge">${c.suitability_pct}%</span>`;
+                cropList.appendChild(li);
+            });
+
+            const fertList = document.getElementById("fertList");
+            fertList.innerHTML = "";
+            (data.fertilizer_recs || []).forEach((f) => {
+                const li = document.createElement("li");
+                li.className = "list-item list-item-stacked";
+                li.innerHTML = `<div class="item-name">${f.fertilizer} (${f.nutrient})</div><div class="item-sub">${f.dose_kg_per_ha} kg/ha</div>`;
+                fertList.appendChild(li);
+            });
+
+            if ((data.fertilizer_recs || []).length === 0) {
+                const li = document.createElement("li");
+                li.className = "list-item list-item-stacked";
+                li.innerHTML = `<div class="item-name">No immediate fertilizer recommendation</div><div class="item-sub">NPK is within target ranges.</div>`;
+                fertList.appendChild(li);
+            }
+
+            const nVal = Number(payload.N);
+            const pVal = Number(payload.P);
+            const kVal = Number(payload.K);
+
+            if (npkChart) npkChart.destroy();
+            npkChart = new Chart(document.getElementById("npkChart"), {
+                type: "bar",
+                data: {
+                    labels: ["N", "P", "K"],
+                    datasets: [
+                        { label: "Actual", data: [nVal, pVal, kVal], backgroundColor: "#2e7d32" },
+                        { label: "Target", data: [80, 30, 150], backgroundColor: "#b7d6bb" }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: "top" } }
+                }
+            });
+
+            if (cropChart) cropChart.destroy();
+            cropChart = new Chart(document.getElementById("cropChart"), {
+                type: "bar",
+                data: {
+                    labels: (data.crop_recs || []).map((c) => c.crop),
+                    datasets: [
+                        {
+                            label: "Suitability %",
+                            data: (data.crop_recs || []).map((c) => c.suitability_pct),
+                            backgroundColor: "#ff9800"
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: "y",
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { min: 0, max: 100 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
